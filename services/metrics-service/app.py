@@ -1,37 +1,26 @@
-import os
-import random
-from flask import Flask, Response, jsonify
+from flask import Flask, jsonify
+import psutil
 
 app = Flask(__name__)
 
-ENVIRONMENT = os.environ.get("APP_ENVIRONMENT", "development")
 
-
-@app.route("/health")
+@app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "UP"})
 
 
-@app.route("/metrics")
+@app.route("/metrics", methods=["GET"])
 def metrics():
-    cpu = random.uniform(5, 80)
-    mem = random.uniform(20, 90)
-    req_count = random.randint(100, 5000)
+    cpu_usage = psutil.cpu_percent(interval=0.1)
 
-    body = (
-        "# HELP app_cpu_usage_percent Simulated CPU usage\n"
-        "# TYPE app_cpu_usage_percent gauge\n"
-        f"app_cpu_usage_percent {cpu:.2f}\n"
-        "# HELP app_memory_usage_percent Simulated memory usage\n"
-        "# TYPE app_memory_usage_percent gauge\n"
-        f"app_memory_usage_percent {mem:.2f}\n"
-        "# HELP app_requests_total Simulated total requests\n"
-        "# TYPE app_requests_total counter\n"
-        f"app_requests_total {req_count}\n"
-    )
+    return f"""# HELP app_cpu_usage_percent Current application CPU usage
+# TYPE app_cpu_usage_percent gauge
+app_cpu_usage_percent {cpu_usage}
+"""
 
-    return Response(body, mimetype="text/plain")
 
+import os
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", "5000"))
+    app.run(host="0.0.0.0", port=port)
