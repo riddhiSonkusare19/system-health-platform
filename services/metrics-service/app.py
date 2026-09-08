@@ -1,5 +1,7 @@
-from flask import Flask, jsonify
+
+from flask import Flask, jsonify, Response
 import psutil
+import os
 
 app = Flask(__name__)
 
@@ -13,13 +15,16 @@ def health():
 def metrics():
     cpu_usage = psutil.cpu_percent(interval=0.1)
 
-    return f"""# HELP app_cpu_usage_percent Current application CPU usage
+    metrics_data = f"""# HELP app_cpu_usage_percent Current application CPU usage
 # TYPE app_cpu_usage_percent gauge
 app_cpu_usage_percent {cpu_usage}
 """
 
+    return Response(
+        metrics_data,
+        mimetype="text/plain"
+    )
 
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))
