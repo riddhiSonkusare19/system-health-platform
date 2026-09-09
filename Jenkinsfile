@@ -5,6 +5,7 @@ pipeline {
     IMAGE_TAG = "${env.BUILD_NUMBER}"
     KIND = "C:\\Users\\lenovo\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\\kind.exe"
     KUBECTL = "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe"
+    KUBECONFIG = "C:\\Users\\lenovo\\.kube\\config"
   }
 
   stages {
