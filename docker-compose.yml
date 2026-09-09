@@ -1,0 +1,29 @@
+﻿services:
+  health-service:
+    build: ./services/health-service
+    container_name: health-service
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: "5000"
+      METRICS_SERVICE_URL: "http://metrics-service:5000"
+      NOTIFIER_SERVICE_URL: "http://notifier-service:5000"
+  metrics-service:
+    build:
+      context: ./services/metrics-service
+    container_name: metrics-service
+    ports:
+      - "5001:5000"
+    environment:
+      - PORT=5000
+  notifier-service:
+    build:
+      context: ./services/notifier-service
+    container_name: notifier-service
+    ports:
+      - "5002:5000"
+    environment:
+      - PORT=5000
+      - HEALTH_SERVICE_URL=http://health-service:5000
+    depends_on:
+      - health-service
