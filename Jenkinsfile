@@ -64,7 +64,7 @@ pipeline {
     stage('Health Check') {
       steps {
         bat "start /B \"\" \"${KUBECTL}\" port-forward svc/health-service 5099:5000"
-        bat 'timeout /T 6'
+        bat 'ping -n 7 127.0.0.1 > nul'
         bat 'curl -f http://localhost:5099/health'
         bat 'curl -f http://localhost:5099/dependencies'
       }
