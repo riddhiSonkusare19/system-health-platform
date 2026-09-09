@@ -3,6 +3,8 @@ pipeline {
 
   environment {
     IMAGE_TAG = "${env.BUILD_NUMBER}"
+    KIND = "C:\\Users\\lenovo\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\\kind.exe"
+    KUBECTL = "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe"
   }
 
   stages {
@@ -40,7 +42,7 @@ pipeline {
       steps {
         script {
           for (svc in ['health-service', 'metrics-service', 'notifier-service']) {
-            bat "kind load docker-image system-health-platform-${svc}:${IMAGE_TAG} --name health-platform"
+            bat "\"${KIND}\" load docker-image system-health-platform-${svc}:${IMAGE_TAG} --name health-platform"
           }
         }
       }
@@ -48,19 +50,19 @@ pipeline {
 
     stage('Deploy') {
       steps {
-        bat 'kubectl apply -f k8s\\health-service.yaml'
-        bat 'kubectl apply -f k8s\\metrics-service.yaml'
-        bat 'kubectl apply -f k8s\\notifier-service.yaml'
-        bat 'kubectl apply -f k8s\\monitoring\\'
-        bat 'kubectl rollout status deployment/health-service --timeout=90s'
-        bat 'kubectl rollout status deployment/metrics-service --timeout=90s'
-        bat 'kubectl rollout status deployment/notifier-service --timeout=90s'
+        bat "\"${KUBECTL}\" apply -f k8s\\health-service.yaml"
+        bat "\"${KUBECTL}\" apply -f k8s\\metrics-service.yaml"
+        bat "\"${KUBECTL}\" apply -f k8s\\notifier-service.yaml"
+        bat "\"${KUBECTL}\" apply -f k8s\\monitoring\\"
+        bat "\"${KUBECTL}\" rollout status deployment/health-service --timeout=90s"
+        bat "\"${KUBECTL}\" rollout status deployment/metrics-service --timeout=90s"
+        bat "\"${KUBECTL}\" rollout status deployment/notifier-service --timeout=90s"
       }
     }
 
     stage('Health Check') {
       steps {
-        bat 'start /B kubectl port-forward svc/health-service 5099:5000'
+        bat "start /B \"\" \"${KUBECTL}\" port-forward svc/health-service 5099:5000"
         bat 'timeout /T 6'
         bat 'curl -f http://localhost:5099/health'
         bat 'curl -f http://localhost:5099/dependencies'
